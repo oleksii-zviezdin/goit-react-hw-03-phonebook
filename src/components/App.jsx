@@ -3,11 +3,27 @@ import { ContactForm, ContactList, Notification, Filter} from './index'
 import { nanoid } from "nanoid";
 import { Container, FormTitle, ContnactsTitle } from "./App.styled";
 
+const LS_KEY = 'contact_list';
+
 export class App extends Component {
 
   state = {
     contacts: [],
     filter: ''
+  }
+
+  componentDidMount() {
+    const contactsFromlocalStorage = JSON.parse(localStorage.getItem(LS_KEY));
+    if (contactsFromlocalStorage) {
+      this.setState({
+      contacts: [...contactsFromlocalStorage],
+    });
+    }
+  }
+
+  componentDidUpdate() {
+    const { contacts } = this.state;
+    localStorage.setItem(LS_KEY, JSON.stringify(contacts));
   }
 
   handleSubmit = (data) => {
@@ -31,7 +47,9 @@ export class App extends Component {
   getFilteredContact = () => {
     const {filter, contacts } = this.state;
     const normailzedContacts = filter.toLowerCase();
-    return contacts.filter(({name}) => name.toLowerCase().includes(normailzedContacts))
+    if (contacts || contacts.length === 0) {
+      return contacts.filter(({name}) => name.toLowerCase().includes(normailzedContacts))
+    }
   }
 
   render() {
